@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+<div class="container d-flex justify-content-between align-items-center my-4">
+	<h2>All Recipes</h2>
+	<a class="btn btn-primary h-25" asp-page="Create">Add a Recipe</a>
+</div>
+
+<div x-data="{ count: 0 }">
+    <button x-on:click="count++">Increment</button>
+ 
+    <span x-text="count"></span>
+</div>
