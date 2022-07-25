@@ -4,14 +4,17 @@
 	ViewData["Title"] = "Home page";
 }
 
-
 <div x-show="tab=='recipes'">
 	<div class="container d-flex justify-content-between align-items-center my-4">
 		<h2>All Recipes</h2>
-		<a class="btn btn-primary h-25" asp-page="Create">Add a Recipe</a>
+		<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+			Add a Recipe
+		</button>
 	</div>
+
+	@* Recipe Cards *@
 	<div x-data="{ recipes: {}}"
-		 x-init="recipes = await fetch('https://localhost:7131/recipes').then(response => response.json());"
+		 x-init="recipes = await getRecipes();"
 		 class="row row-cols-sm-1 row-cols-xl-2 g-4">
 		<template x-for="recipe in recipes">
 			<div class="col">
@@ -25,6 +28,8 @@
 						</template>
 
 						<div class="accordion">
+
+							@* Ingredients *@
 							<div class="accordion-item" x-data x-id=['Ingredients'+recipe.id]>
 								<h2 class="accordion-header">
 									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#' + $id('Ingredients'+recipe.id)" aria-expanded="true" :aria-controls="$id('Ingredients'+recipe.id)">
@@ -44,6 +49,7 @@
 								</div>
 							</div>
 
+							@* Instructions *@
 							<div class="accordion-item" x-data x-id=['Instructions'+recipe.id]>
 								<h2 class="accordion-header">
 									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#' + $id('Instructions'+recipe.id)" aria-expanded="true" :aria-controls="$id('Instructions'+recipe.id)">
@@ -65,14 +71,15 @@
 
 						</div>
 
+						@* Buttons *@
 						<div class="text-center mt-3">
 							<div class="btn-group">
-								<a class="btn btn-primary">
+								<button class="btn btn-primary">
 									<i class="bi bi-pencil-square"></i>
-								</a>
-								<a class="btn btn-danger">
+								</button>
+								<button class="btn btn-danger">
 									<i class="bi bi-trash"></i>
-								</a>
+								</button>
 							</div>
 						</div>
 
@@ -89,9 +96,11 @@
 		<a class="btn btn-primary h-25" asp-page="Create">Add a Category</a>
 	</div>
 
-	<div class="row row-cols-auto justify-content-center g-4"
+	@* Category Cards *@
+	<div class="row row-cols-auto justify-content-center g-4 mx-5"
 		 x-data="{ categories: {}}"
-		 x-init="categories = await fetch('https://localhost:7131/categories').then(response => response.json());">
+		 x-init="categories = await getCategories();">
+
 		<template x-for="category in categories">
 			<div class="col">
 				<div class="card text-center">
@@ -112,3 +121,103 @@
 
 	</div>
 </div>
+
+<!-- Add Recipe Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content"
+			 x-data="{recipe: {title: '', ingredients: [], instructions: [], categories:[]}, availablecategories: ''}"
+			 x-init="availablecategories = await getCategories();">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form method="post">
+					<div class="my-3 row">
+						<label for="createRecipeTitle" class="col-2 col-form-label">Title</label>
+						<div class="col-7">
+							<input id="createRecipeTitle" x-model="recipe.title" class="form-control" />
+						</div>
+					</div>
+
+					<div class="my-3 row">
+						<label for="createRecipeIngredients" class="col-form-label col-2">Ingredients</label>
+						<div class="col-7">
+							<textarea class="form-control" x-model="recipe.ingredients" id="createRecipeIngredients" rows="5" placeholder="enter every ingredient on a separate line"></textarea>
+						</div>
+					</div>
+
+					<div class="my-3 row">
+						<label for="createRecipeInstructions" class="col-form-label col-2 ">Instructions</label>
+						<div class="col-7">
+							<textarea class="form-control" x-model="recipe.instructions" id="createRecipeInstructions" rows="5" placeholder="enter every instruction on a separate line"></textarea>
+						</div>
+					</div>
+
+					<div class="my-3 row">
+						<label for="createRecipeCategories" class="col-form-label col-2 ">Categories</label>
+						<div class="col-7">
+							<template x-for="category in availablecategories">
+								<div>
+									<input x-id="['category'+category]" type="checkbox" :value="category" x-model="recipe.categories">
+									<label for="$id('category'+category)" x-text="category"></label>
+									<br />
+								</div>
+							</template>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" x-on:click="postRecipe(recipe);">
+					Create recipe
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function getRecipes() {
+		return fetch('https://localhost:7131/recipes').then(response => response.json());
+	}
+	function getCategories() {
+		return fetch('https://localhost:7131/categories').then(response => response.json());
+	}
+	function postRecipe(recipe) {
+		return fetch('https: //localhost:7131/recipes', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(recipe),
+		})
+			.then(response =>
+				response.json())
+			.then(data => {
+				console.log('Success:', data);
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+			});
+	}
+	function putRecipe(recipe) {
+		return fetch('https: //localhost:7131/recipes', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(recipe),
+		})
+			.then(response =>
+				response.json())
+			.then(data => {
+				console.log('Success:', data);
+			})
+			.catch((error) => {
+				console.error('Error:', error);
+			});
+	}
+</script>
