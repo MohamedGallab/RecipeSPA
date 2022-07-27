@@ -125,15 +125,16 @@
 <!-- Add Recipe Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
-		<div class="modal-content"
-			 x-data="{recipe: {title: '', ingredients: [], instructions: [], categories:[]}, availablecategories: ''}"
-			 x-init="availablecategories = await getCategories();">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<form method="post">
+		<form x-on:submit.prevent="$el.reset();postRecipe(recipe);"
+			  x-data="{recipe: {title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
+			  x-init="availablecategories = await getCategories();">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+
 					<div class="my-3 row">
 						<label for="createRecipeTitle" class="col-2 col-form-label">Title</label>
 						<div class="col-7">
@@ -149,7 +150,7 @@
 					</div>
 
 					<div class="my-3 row">
-						<label for="createRecipeInstructions" class="col-form-label col-2 ">Instructions</label>
+						<label for="createRecipeInstructions" class="col-form-label col-2">Instructions</label>
 						<div class="col-7">
 							<textarea class="form-control" x-model="recipe.instructions" id="createRecipeInstructions" rows="5" placeholder="enter every instruction on a separate line"></textarea>
 						</div>
@@ -167,32 +168,35 @@
 							</template>
 						</div>
 					</div>
-				</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">
+						Create recipe
+					</button>
+				</div>
 			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary" x-on:click="postRecipe(recipe);">
-					Create recipe
-				</button>
-			</div>
-		</div>
+		</form>
 	</div>
 </div>
 
 <script type="text/javascript">
+	const baseUrl = 'https://localhost:7131';
 	function getRecipes() {
-		return fetch('https://localhost:7131/recipes').then(response => response.json());
+		return fetch(new URL('/recipes', baseUrl).toString()).then(response => response.json());
 	}
 	function getCategories() {
-		return fetch('https://localhost:7131/categories').then(response => response.json());
+		return fetch(new URL('/categories', baseUrl).toString()).then(response => response.json());
 	}
 	function postRecipe(recipe) {
-		return fetch('https: //localhost:7131/recipes', {
+		recipe.ingredients = recipe.ingredients.split('\n');
+		recipe.instructions = recipe.instructions.split('\n');
+		return fetch(new URL('/recipes', baseUrl).toString(), {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(recipe),
+			body: JSON.stringify(recipe)
 		})
 			.then(response =>
 				response.json())
@@ -204,12 +208,14 @@
 			});
 	}
 	function putRecipe(recipe) {
-		return fetch('https: //localhost:7131/recipes', {
+		recipe.ingredients = recipe.ingredients.split('\n');
+		recipe.instructions = recipe.instructions.split('\n');
+		return fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(recipe),
+			body: JSON.stringify(recipe)
 		})
 			.then(response =>
 				response.json())
