@@ -4,6 +4,7 @@
 	ViewData["Title"] = "Home page";
 }
 
+@* Recipes Tab *@
 <div x-show="tab == 'recipes'">
 	<div class="container d-flex justify-content-between align-items-center my-4">
 		<h2>All Recipes</h2>
@@ -13,7 +14,7 @@
 	</div>
 
 	@* Recipe Cards *@
-	<div x-data="{recipes: {}}"
+	<div x-data="{recipes: []}"
 		 x-effect="recipes = await $store.recipes;"
 		 x-cloak
 		 class="row row-cols-sm-1 row-cols-xl-2 g-4 pb-5">
@@ -31,13 +32,13 @@
 						<div class="accordion">
 
 							@* Ingredients *@
-							<div class="accordion-item" x-data x-id="['Ingredients' + recipe.id]">
+							<div class="accordion-item">
 								<h2 class="accordion-header">
-									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#' + $id('Ingredients' + recipe.id)" aria-expanded="true" :aria-controls="$id('Ingredients' + recipe.id)">
+									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#Ingredients' + recipe.id" aria-expanded="true" :aria-controls="'Ingredients' + recipe.id">
 										Ingredients
 									</button>
 								</h2>
-								<div x-data :id="$id('Ingredients' + recipe.id)" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+								<div x-data :id="'Ingredients' + recipe.id" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
 									<div class="accordion-body">
 										<ul>
 											<template x-for="ingredient in recipe.ingredients">
@@ -51,13 +52,13 @@
 							</div>
 
 							@* Instructions *@
-							<div class="accordion-item" x-data x-id="['Instructions' + recipe.id]">
+							<div class="accordion-item">
 								<h2 class="accordion-header">
-									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#' + $id('Instructions' + recipe.id)" aria-expanded="true" :aria-controls="$id('Instructions' + recipe.id)">
+									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#Instructions' + recipe.id" aria-expanded="true" :aria-controls="Instructions' + recipe.id">
 										Instructions
 									</button>
 								</h2>
-								<div x-data :id="$id('Instructions' + recipe.id)" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
+								<div x-data :id="'Instructions' + recipe.id" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne">
 									<div class="accordion-body">
 										<ul>
 											<template x-for="instruction in recipe.instructions">
@@ -115,9 +116,9 @@
 						<div class="modal fade" :id="'editRecipeModal'+recipe.id" tabindex="-1">
 							<div class="modal-dialog modal-lg">
 								<div class="modal-content">
-									<form x-on:submit.prevent="await putRecipe(formatRecipe(recipe)); $el.reset(); $store.recipes = await getRecipes();"
-										  x-data="{recipe: {id: recipe.id, title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
-										  x-init="availablecategories = await getCategories();">
+									<form x-on:submit.prevent="await putRecipe(formatRecipe(recipe)); $store.recipes = await getRecipes();"
+										  x-data="{recipe: {id: recipe.id, title: recipe.title, ingredients: recipe.ingredients.join('\n'), instructions: recipe.instructions.join('\n'), categories: recipe.categories}, availablecategories: ''}"
+										  x-effect="availablecategories = await $store.categories; ">
 										<div class="modal-header">
 											<h5 class="modal-title">Modal title</h5>
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -175,6 +176,7 @@
 	</div>
 </div>
 
+@* Category Tab *@
 <div x-show="tab=='categories'">
 	<div class="container d-flex justify-content-between align-items-center my-4">
 		<h2>All Categories</h2>
@@ -185,7 +187,7 @@
 
 	@* Category Cards *@
 	<div class="row row-cols-auto justify-content-center g-4 mx-5"
-		 x-data="{ categories: {}}"
+		 x-data="{ categories: []}"
 		 x-effect="categories = await $store.categories;"
 		 x-cloak>
 
@@ -208,8 +210,9 @@
 					<div class="modal fade" :id="'editCategoryModal' + category" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
 							<div class="modal-content">
-								<form x-on:submit.prevent="await putCategory(oldCategory, editedCategory); $el.reset(); $store.categories = await getCategories();"
-									  x-data="{oldCategory: category, editedCategory: ''}">
+								<form x-on:submit.prevent="await putCategory(oldCategory, editedCategory); await updateDB();"
+									  x-data="{oldCategory: '', editedCategory: ''}"
+									  x-effect="oldCategory=category; editedCategory=category;">
 									<div class="modal-header">
 										<h5 class="modal-title" id="editCategoryModalLabel">What is the new category name?</h5>
 										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -236,8 +239,9 @@
 					<div class="modal fade" :id="'deleteCategoryModal' + category" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
 							<div class="modal-content">
-								<form x-on:submit.prevent="await deleteCategory(category); $el.reset(); $store.categories = await getCategories();"
-									  x-data="{category: category}">
+								<form x-on:submit.prevent="await deleteCategory(modalCategory); $el.reset(); await updateDB();"
+									  x-data="{modalCategory: ''}"
+									  x-effect="modalCategory = category">
 									<div class="modal-header">
 										<h5 class="modal-title" id="deleteCategoryModalLabel">Are you sure you want to delete this category?</h5>
 										<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -247,7 +251,7 @@
 											<dt>
 												Category
 											</dt>
-											<dd x-html="category">
+											<dd x-html="modalCategory">
 											</dd>
 										</dl>
 									</div>
@@ -268,13 +272,13 @@
 	</div>
 </div>
 
-<!-- Add Recipe Modal -->
+@* Add Recipe Modal *@
 <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-labelledby="createRecipeModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
-			<form x-on:submit.prevent="await postRecipe(formatRecipe(recipe)); $el.reset(); $store.recipes = await getRecipes();"
+			<form x-on:submit.prevent="await postRecipe(formatRecipe(recipe)); $el.reset(); await updateDB();"
 				  x-data="{recipe: {title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
-				  x-init="availablecategories = await getCategories();">
+				  x-effect="availablecategories = await $store.categories">
 				<div class="modal-header">
 					<h5 class="modal-title" id="createRecipeModalLabel">What is the recipe like?</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -329,7 +333,7 @@
 <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form x-on:submit.prevent="await postCategory(category); $el.reset(); $store.categories = await getCategories();"
+			<form x-on:submit.prevent="await postCategory(category); $el.reset(); await updateDB();"
 				  x-data="{category: ''}">
 				<div class="modal-header">
 					<h5 class="modal-title" id="createCategoryModalLabel">What is the new category</h5>
@@ -359,7 +363,12 @@
 		Alpine.store('categories', getCategories());
 	});
 
-	const baseUrl = 'https://localhost:7131';
+	const baseUrl = 'https://mohamedgallab.azurewebsites.net';
+
+	async function updateDB() {
+		Alpine.store('recipes', getRecipes());
+		Alpine.store('categories', getCategories());
+	}
 
 	async function getRecipes() {
 		return fetch(new URL('/recipes', baseUrl).toString()).then(response => response.json());
@@ -433,7 +442,7 @@
 	}
 
 	async function putCategory(category, editedCategory) {
-		return fetch(new URL(`/categories/${category}?editedcategory=${editedCategory}&`, baseUrl).toString(), {
+		return fetch(new URL(`/categories/${category}?editedcategory=${editedCategory}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
