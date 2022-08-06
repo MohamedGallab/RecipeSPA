@@ -197,17 +197,17 @@
 					<div class="card-body">
 						<h5 class="card-title" x-text="category"></h5>
 						<div class="btn-group">
-							<button class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#editCategoryModal' + category">
+							<button class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#editCategoryModal' + category.replace(/\s/g, '');">
 								<i class="bi bi-pencil-square"></i>
 							</button>
-							<button class="btn btn-danger" data-bs-toggle="modal" :data-bs-target="'#deleteCategoryModal' + category">
+							<button class="btn btn-danger" data-bs-toggle="modal" :data-bs-target="'#deleteCategoryModal' + category.replace(/\s/g, '');">
 								<i class="bi bi-trash"></i>
 							</button>
 						</div>
 					</div>
 
 					@* Edit Category Modal *@
-					<div class="modal fade" :id="'editCategoryModal' + category" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+					<div class="modal fade" :id="'editCategoryModal' + category.replace(/\s/g, '');" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
 							<div class="modal-content">
 								<form x-on:submit.prevent="await putCategory(oldCategory, editedCategory); await updateDB();"
@@ -236,7 +236,7 @@
 					</div>
 
 					@* Delete Category Modal *@
-					<div class="modal fade" :id="'deleteCategoryModal' + category" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+					<div class="modal fade" :id="'deleteCategoryModal' + category.replace(/\s/g, '');" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
 						<div class="modal-dialog">
 							<div class="modal-content">
 								<form x-on:submit.prevent="await deleteCategory(modalCategory); $el.reset(); await updateDB();"
