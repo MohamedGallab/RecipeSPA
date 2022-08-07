@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{00CFE174-7DD1-4703-B45E-8909D8A44075}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeAPI", "..\Service Driven Recipe Console\RecipeAPI\RecipeAPI.csproj", "{03C305DA-88F6-4933-8789-A1C6906D53BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{00CFE174-7DD1-4703-B45E-8909D8A44075}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00CFE174-7DD1-4703-B45E-8909D8A44075}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00CFE174-7DD1-4703-B45E-8909D8A44075}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03C305DA-88F6-4933-8789-A1C6906D53BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03C305DA-88F6-4933-8789-A1C6906D53BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03C305DA-88F6-4933-8789-A1C6906D53BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03C305DA-88F6-4933-8789-A1C6906D53BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
