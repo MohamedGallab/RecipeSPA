@@ -1,7 +1,9 @@
 ﻿@page
 @model IndexModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
 @{
-	ViewData["Title"] = "Home page";
+	ViewData["Title"] = "Yumyums";
 }
 
 @* Recipes Tab *@
@@ -54,7 +56,7 @@
 							@* Instructions *@
 							<div class="accordion-item">
 								<h2 class="accordion-header">
-									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#Instructions' + recipe.id" aria-expanded="true" :aria-controls="Instructions' + recipe.id">
+									<button x-data class="accordion-button collapsed" type="button" data-bs-toggle="collapse" :data-bs-target="'#Instructions' + recipe.id" aria-expanded="true" :aria-controls="'Instructions' + recipe.id">
 										Instructions
 									</button>
 								</h2>
@@ -117,7 +119,7 @@
 							<div class="modal-dialog modal-lg">
 								<div class="modal-content">
 									<form x-on:submit.prevent="await putRecipe(formatRecipe(recipe)); $store.recipes = await getRecipes();"
-										  x-data="{recipe: {id: recipe.id, title: recipe.title, ingredients: recipe.ingredients.join('\n'), instructions: recipe.instructions.join('\n'), categories: recipe.categories}, availablecategories: ''}"
+										  x-data="{recipe: {id: recipe.id, title: recipe.title, ingredients: recipe.ingredients.join('\n'), instructions: recipe.instructions.join('\n'), categories: recipe.categories}, availablecategories: []}"
 										  x-effect="availablecategories = await $store.categories; ">
 										<div class="modal-header">
 											<h5 class="modal-title">Modal title</h5>
@@ -151,8 +153,8 @@
 												<div class="col-7">
 													<template x-for="category in availablecategories">
 														<div>
-															<input x-id="['category'+category]" type="checkbox" :value="category" x-model="recipe.categories">
-															<label for="$id('category'+category)" x-text="category"></label>
+															<input :id="'category'+ category + recipe.id" type="checkbox" :value="category" x-model="recipe.categories">
+															<label :for="'category'+ category + recipe.id" x-text="category"></label>
 															<br />
 														</div>
 													</template>
@@ -311,8 +313,8 @@
 						<div class="col-7">
 							<template x-for="category in availablecategories">
 								<div>
-									<input x-id="['category'+category]" type="checkbox" :value="category" x-model="recipe.categories">
-									<label for="$id('category'+category)" x-text="category"></label>
+									<input :id="'category'+ category + recipe.id" type="checkbox" :value="category" x-model="recipe.categories">
+									<label :for="'category'+ category + recipe.id" x-text="category"></label>
 									<br />
 								</div>
 							</template>
@@ -363,7 +365,7 @@
 		Alpine.store('categories', getCategories());
 	});
 
-	const baseUrl = 'https://mohamedgallab.azurewebsites.net';
+	const baseUrl = '@Configuration["BaseUrl"]';
 
 	async function updateDB() {
 		Alpine.store('recipes', getRecipes());
