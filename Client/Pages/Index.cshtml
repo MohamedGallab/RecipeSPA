@@ -400,9 +400,8 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
-                text: `Successfully created recipe ${data.title}`,
+                text: `Successfully created recipe ${recipe.title}`,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -431,9 +430,8 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
-                text: `Successfully created category ${data}`,
+                text: `Successfully created category ${category}`,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -463,9 +461,8 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
-                text: `Successfully edited recipe ${data.title}`,
+                text: `Successfully edited recipe ${recipe.title}`,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -494,9 +491,8 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
-                text: `Successfully edited category ${data}`,
+                text: `Successfully edited category ${category}`,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -522,9 +518,8 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
-                text: `Successfully deleted recipe ${data.title}`,
+                text: `Successfully deleted recipe ${recipe.title}`,
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
@@ -550,7 +545,6 @@
 		});
 
         if (response.ok) {
-            let data = await response.json();
             Swal.fire({
                 text: `Successfully deleted category ${category}`,
                 toast: true,
