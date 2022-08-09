@@ -19,7 +19,7 @@
 	<div x-data="{recipes: []}"
 		 x-effect="recipes = await $store.recipes;"
 		 x-cloak
-		 class="row row-cols-sm-1 row-cols-xl-2 g-4 pb-5">
+		 class="row row-cols-1 row-cols-xl-2 g-4 pb-5">
 		<template x-for="recipe in recipes">
 			<div class="col">
 				<div class="card">
@@ -122,7 +122,7 @@
 										  x-data="{recipe: {id: recipe.id, title: recipe.title, ingredients: recipe.ingredients.join('\n'), instructions: recipe.instructions.join('\n'), categories: recipe.categories}, availablecategories: []}"
 										  x-effect="availablecategories = await $store.categories; ">
 										<div class="modal-header">
-											<h5 class="modal-title">Modal title</h5>
+											<h5 class="modal-title">Recipe Details</h5>
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										</div>
 										<div class="modal-body">
@@ -130,7 +130,7 @@
 											<div class="my-3 row">
 												<label for="editRecipeTitle" class="col-2 col-form-label">Title</label>
 												<div class="col-7">
-													<input id="editRecipeTitle" x-model="recipe.title" class="form-control" />
+													<input id="editRecipeTitle" x-model="recipe.title" class="form-control" required />
 												</div>
 											</div>
 
@@ -162,7 +162,7 @@
 											</div>
 										</div>
 										<div class="modal-footer">
-											<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+											<button type="submit" class="btn btn-primary">
 												edit recipe
 											</button>
 										</div>
@@ -223,12 +223,12 @@
 										<div class="my-3 row">
 											<label for="editCategoryTitle" class="col-2 col-form-label">Title</label>
 											<div class="col-10">
-												<input id="editCategoryTitle" x-model="editedCategory" class="form-control" />
+												<input id="editCategoryTitle" x-model="editedCategory" class="form-control" required />
 											</div>
 										</div>
 									</div>
 									<div class="modal-footer">
-										<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+										<button type="submit" class="btn btn-primary">
 											Edit Category
 										</button>
 									</div>
@@ -290,7 +290,7 @@
 					<div class="my-3 row">
 						<label for="createRecipeTitle" class="col-2 col-form-label">Title</label>
 						<div class="col-7">
-							<input id="createRecipeTitle" x-model="recipe.title" class="form-control" />
+							<input id="createRecipeTitle" x-model="recipe.title" class="form-control" required />
 						</div>
 					</div>
 
@@ -322,7 +322,7 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+					<button type="submit" class="btn btn-primary">
 						Create recipe
 					</button>
 				</div>
@@ -335,7 +335,7 @@
 <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form x-on:submit.prevent="await postCategory(category); $el.reset(); await updateDB();"
+			<form x-on:submit.prevent="await postCategory(category); console.log($el); $el.reset(); category = ''; await updateDB();"
 				  x-data="{category: ''}">
 				<div class="modal-header">
 					<h5 class="modal-title" id="createCategoryModalLabel">What is the new category</h5>
@@ -345,12 +345,12 @@
 					<div class="my-3 row">
 						<label for="createCategoryTitle" class="col-2 col-form-label">Title</label>
 						<div class="col-10">
-							<input id="createCategoryTitle" x-model="category" class="form-control" />
+							<input id="createCategoryTitle" x-model="category" class="form-control" required />
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+					<button type="submit" class="btn btn-primary">
 						Create Category
 					</button>
 				</div>
@@ -391,100 +391,184 @@
 	}
 
 	async function postRecipe(recipe) {
-		return fetch(new URL('/recipes', baseUrl).toString(), {
+		let response = await fetch(new URL('/recipes', baseUrl).toString(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(recipe)
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully created recipe ${data.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to create recipe ${recipe.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 
 	async function postCategory(category) {
-		return fetch(new URL(`/categories?category=${category}`, baseUrl).toString(), {
+		let response = await fetch(new URL(`/categories?category=${category}`, baseUrl).toString(), {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully created category ${data}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to create category ${category}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 
 	async function putRecipe(recipe) {
-		return fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
+		let response = await fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(recipe)
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully edited recipe ${data.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to edit recipe ${recipe.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 
 	async function putCategory(category, editedCategory) {
-		return fetch(new URL(`/categories/${category}?editedcategory=${editedCategory}`, baseUrl).toString(), {
+		let response = await fetch(new URL(`/categories/${category}?editedcategory=${editedCategory}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully edited category ${data}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to edit category ${category}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 
 	async function deleteRecipe(recipe) {
-		return fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
+		let response = await fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
 			method: 'DELETE'
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully deleted recipe ${data.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to delete recipe ${recipe.title}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 
 	async function deleteCategory(category) {
-		return fetch(new URL(`/categories/${category}`, baseUrl).toString(), {
+		let response = await fetch(new URL(`/categories/${category}`, baseUrl).toString(), {
 			method: 'DELETE'
-		})
-			.then(response =>
-				response.json())
-			.then(data => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		});
+
+        if (response.ok) {
+            let data = await response.json();
+            Swal.fire({
+                text: `Successfully deleted category ${category}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'success',
+                timer: 1700
+            });
+        }
+        else {
+			Swal.fire({
+                text: `Failed to delete category ${category}`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                icon: 'error',
+                timer: 1700
+            });
+		}
 	}
 </script>
