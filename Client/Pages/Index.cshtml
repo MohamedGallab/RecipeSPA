@@ -2,9 +2,13 @@
 @model IndexModel
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
 	ViewData["Title"] = "Yumyums";
+	var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
+
+<input id="X-XSRF-TOKEN" type="hidden" value="@requestToken" />
 
 @* Recipes Tab *@
 <div x-show="tab == 'recipes'">
@@ -373,11 +377,23 @@
 	}
 
 	async function getRecipes() {
-		return fetch(new URL('/recipes', baseUrl).toString()).then(response => response.json());
+		return fetch(new URL('/recipes', baseUrl).toString(), {
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
+			}
+		}).then(response => response.json());
 	}
 
 	async function getCategories() {
-		return fetch(new URL('/categories', baseUrl).toString()).then(response => response.json());
+		return fetch(new URL('/categories', baseUrl).toString(), {
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
+			}
+		}).then(response => response.json());
 	}
 
 	function formatRecipe(recipe) {
@@ -394,30 +410,32 @@
 		let response = await fetch(new URL('/recipes', baseUrl).toString(), {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
 			},
 			body: JSON.stringify(recipe)
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully created recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to create recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully created recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to create recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 
@@ -425,29 +443,31 @@
 		let response = await fetch(new URL(`/categories?category=${category}`, baseUrl).toString(), {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
 			}
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully created category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to create category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully created category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to create category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 
@@ -455,30 +475,32 @@
 		let response = await fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
 			},
 			body: JSON.stringify(recipe)
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully edited recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to edit recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully edited recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to edit recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 
@@ -486,83 +508,95 @@
 		let response = await fetch(new URL(`/categories/${category}?editedcategory=${editedCategory}`, baseUrl).toString(), {
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
 			}
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully edited category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to edit category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully edited category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to edit category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 
 	async function deleteRecipe(recipe) {
 		let response = await fetch(new URL(`/recipes/${recipe.id}`, baseUrl).toString(), {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
+			}
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully deleted recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to delete recipe ${recipe.title}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully deleted recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to delete recipe ${recipe.title}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 
 	async function deleteCategory(category) {
 		let response = await fetch(new URL(`/categories/${category}`, baseUrl).toString(), {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-XSRF-TOKEN':
+					document.getElementById("X-XSRF-TOKEN").value
+			}
 		});
 
-        if (response.ok) {
-            Swal.fire({
-                text: `Successfully deleted category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'success',
-                timer: 1700
-            });
-        }
-        else {
+		if (response.ok) {
 			Swal.fire({
-                text: `Failed to delete category ${category}`,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                icon: 'error',
-                timer: 1700
-            });
+				text: `Successfully deleted category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'success',
+				timer: 1700
+			});
+		}
+		else {
+			Swal.fire({
+				text: `Failed to delete category ${category}`,
+				toast: true,
+				position: 'top-end',
+				showConfirmButton: false,
+				icon: 'error',
+				timer: 1700
+			});
 		}
 	}
 </script>
