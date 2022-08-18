@@ -371,6 +371,19 @@
 
 	const baseUrl = '@Configuration["BaseUrl"]';
 
+	var response = await fetch(new URL('/antiforgery/token', baseUrl).toString(), {
+		method: "GET",
+		headers: { "Authorization": authorizationToken }
+	});
+
+	if (response.ok) {
+		// https://developer.mozilla.org/docs/web/api/document/cookie
+		document.getElementById("X-XSRF-TOKEN").value = document.cookie
+			.split("; ")
+			.find(row => row.startsWith("XSRF-TOKEN="))
+			.split("=")[1];
+	}
+
 	async function updateDB() {
 		Alpine.store('recipes', getRecipes());
 		Alpine.store('categories', getCategories());
