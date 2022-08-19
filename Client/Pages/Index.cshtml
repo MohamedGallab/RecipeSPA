@@ -8,8 +8,6 @@
 	var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
-<input id="X-XSRF-TOKEN" type="hidden" value="@requestToken" />
-
 @* Recipes Tab *@
 <div x-show="tab == 'recipes'">
 	<div class="container d-flex justify-content-between align-items-center my-4">
@@ -371,19 +369,6 @@
 
 	const baseUrl = '@Configuration["BaseUrl"]';
 
-	var response = await fetch(new URL('/antiforgery/token', baseUrl).toString(), {
-		method: "GET",
-		headers: { "Authorization": authorizationToken }
-	});
-
-	if (response.ok) {
-		// https://developer.mozilla.org/docs/web/api/document/cookie
-		document.getElementById("X-XSRF-TOKEN").value = document.cookie
-			.split("; ")
-			.find(row => row.startsWith("XSRF-TOKEN="))
-			.split("=")[1];
-	}
-
 	async function updateDB() {
 		Alpine.store('recipes', getRecipes());
 		Alpine.store('categories', getCategories());
@@ -393,8 +378,8 @@
 		return fetch(new URL('/recipes', baseUrl).toString(), {
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		}).then(response => response.json());
 	}
@@ -403,8 +388,8 @@
 		return fetch(new URL('/categories', baseUrl).toString(), {
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		}).then(response => response.json());
 	}
@@ -424,8 +409,8 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			},
 			body: JSON.stringify(recipe)
 		});
@@ -457,8 +442,8 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		});
 
@@ -489,8 +474,8 @@
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			},
 			body: JSON.stringify(recipe)
 		});
@@ -522,8 +507,8 @@
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		});
 
@@ -554,8 +539,8 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		});
 
@@ -586,8 +571,8 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				'X-XSRF-TOKEN':
-					document.getElementById("X-XSRF-TOKEN").value
+				'RequestVerificationToken':
+					'@requestToken'
 			}
 		});
 
