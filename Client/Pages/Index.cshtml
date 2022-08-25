@@ -4,7 +4,6 @@
 @inject IConfiguration Configuration
 @{
 	ViewData["Title"] = "Yumyums";
-	var requestToken = "";
 }
 
 @* Recipes Tab *@
@@ -336,7 +335,7 @@
 <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form x-on:submit.prevent="await postCategory(category); console.log($el); $el.reset(); category = ''; await updateDB();"
+			<form x-on:submit.prevent="await postCategory(category); $el.reset(); category = ''; await updateDB();"
 				  x-data="{category: ''}">
 				<div class="modal-header">
 					<h5 class="modal-title" id="createCategoryModalLabel">What is the new category</h5>
@@ -363,8 +362,9 @@
 	const baseUrl = '@Configuration["BaseUrl"]';
 
 	async function getToken() {
-		var response = await fetch(new URL('/antiforgery/token', baseUrl).toString(), {
-			method: "GET"
+		let response = await fetch(new URL('/antiforgery/token', baseUrl).toString(), {
+			method: "GET",
+			credentials: 'include'
 		});
 
 		if (response.ok) {
