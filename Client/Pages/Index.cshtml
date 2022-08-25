@@ -364,12 +364,10 @@
 
 	async function getToken() {
 		var response = await fetch(new URL('/antiforgery/token', baseUrl).toString(), {
-			method: "GET",
-			credentials: 'include'
+			method: "GET"
 		});
 
 		if (response.ok) {
-			console.log(document.cookie);
 			return document.cookie
 				.split("; ")
 				.find(row => row.startsWith("XSRF-TOKEN="))
