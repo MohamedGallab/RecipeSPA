@@ -392,7 +392,7 @@
 		return fetch(new URL('/recipes', baseUrl).toString(), {
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		}).then(response => response.json());
@@ -402,7 +402,7 @@
 		return fetch(new URL('/categories', baseUrl).toString(), {
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		}).then(response => response.json());
@@ -423,7 +423,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include',
 			body: JSON.stringify(recipe)
@@ -456,7 +456,7 @@
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		});
@@ -488,7 +488,7 @@
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include',
 			body: JSON.stringify(recipe)
@@ -521,7 +521,7 @@
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		});
@@ -553,7 +553,7 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		});
@@ -585,7 +585,7 @@
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				'XSRF-TOKEN': await Alpine.store('xsrfToken')
+				'X-XSRF-TOKEN': await Alpine.store('xsrfToken')
 			},
 			credentials: 'include'
 		});
